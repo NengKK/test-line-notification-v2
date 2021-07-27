@@ -1,0 +1,38 @@
+{
+  "name": "test-line-notification-v2",
+  "version": "1.0.0",
+  "description": "Testing LINE notify on Google Cloud environment",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx tsc --project ./",
+    "dev": "npm run build && nodemon",
+    "start": "node built/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NengKK/test-line-notification-v2.git"
+  },
+  "keywords": [
+    "LINE",
+    "notifify",
+    "Google",
+    "Cloud"
+  ],
+  "author": "Kittisak Kumdang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NengKK/test-line-notification-v2/issues"
+  },
+  "homepage": "https://github.com/NengKK/test-line-notification-v2#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^16.4.3",
+    "nodemon": "^2.0.12",
+    "ts-node": "^10.1.0",
+    "typescript": "^4.3.5"
+  }
+}
