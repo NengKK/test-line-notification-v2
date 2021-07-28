@@ -26,6 +26,8 @@
   },
   "homepage": "https://github.com/NengKK/test-line-notification-v2#readme",
   "dependencies": {
+    "axios": "^0.21.1",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1"
   },
   "devDependencies": {
