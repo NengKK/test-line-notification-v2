@@ -1,63 +1,15 @@
-import express, { response } from 'express';
+import express from 'express';
 import axios, {AxiosRequestConfig} from 'axios';
 import {IAqiData} from './models/AQI/IAqiData';
 import { aqiClassification } from './lib/AQI/aqi-classification';
 import { Send } from './lib/LINE/notify';
 require('dotenv').config();
-import qs from 'qs';
 
 const app = express();
+const PORT = process.env.PORT || 8080;
 
 app.get('/', (req, res) => {
   res.send('Alive!');
-});
-
-app.get('/connect', (req, res) => {
-  const appBaseUrl = process.env.APP_BASE_URL;
-  const oauthUrl = process.env.LINE_NOTIFY_OAUTH_URL;
-  const oauthState = process.env.LINE_NOTIFY_OAUTH_STATE;
-  const clientId = process.env.LINE_NOTIFY_OAUTH_CLIENT_ID;
-
-  res.redirect(`${oauthUrl}/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${appBaseUrl}/oauth&scope=notify&state=${oauthState}`);
-});
-
-app.get('/oauth', async (req, res) => {
-  const appBaseUrl = process.env.APP_BASE_URL;
-  const oauthUrl = process.env.LINE_NOTIFY_OAUTH_URL;
-  const clientId = process.env.LINE_NOTIFY_OAUTH_CLIENT_ID;
-  const clientSecret = process.env.LINE_NOTIFY_OAUTH_CLIENT_SECRET;
-  const code = req.query.code;
-  const state = req.query.state;
-
-  if (state === process.env.LINE_NOTIFY_OAUTH_STATE) {
-    const options: AxiosRequestConfig = {
-      method: 'POST',
-      url: `${oauthUrl}/oauth/token`,
-      data: qs.stringify({
-        grant_type: 'authorization_code',
-        code: code,
-        redirect_uri: `${appBaseUrl}/oauth`,
-        client_id: clientId,
-        client_secret: clientSecret
-      }),
-      headers: { 'content-type': ' application/x-www-form-urlencoded' }
-    };
-    
-    try {
-      const { data } = await axios(options);
-      console.log(`Authentication success: ${JSON.stringify(data)}`);
-      res.send(data);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error(`Axios error: ${error}`);
-      } else {
-        console.error(`Unexpected error: ${error}`);
-      }
-      res.send('Authentication error');
-    }
-  } else {
-    res.redirect('/');
-  }
 });
 
 app.get('/test', async (req, res) => {
@@ -130,6 +82,6 @@ app.get('/aqi', async (req, res) => {
   res.send(message);
 });
 
-app.listen(3000, () => {
-  console.log('Listening on port 3000!');
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}!`);
 });

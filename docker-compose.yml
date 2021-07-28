@@ -1,0 +1,13 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "80:${PORT}"
+    environment:
+      - AQI_CN_URL=${AQI_CN_URL}
+      - AQI_CN_TOKEN=${AQI_CN_TOKEN}
+      - DEFAULT_LOCATION_NAME=${DEFAULT_LOCATION_NAME}
+      - LINE_NOTIFY_ACCESS_TOKEN=${LINE_NOTIFY_ACCESS_TOKEN}
+      - LINE_NOTIFY_BASE_URL=${LINE_NOTIFY_BASE_URL}
+      - PORT=${PORT}
