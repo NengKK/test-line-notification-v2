@@ -6,6 +6,7 @@
   "scripts": {
     "build": "npx tsc --project ./",
     "dev": "npm run build && nodemon",
+    "docker-compose": "docker-compose --env-file ./.env up --build",
     "start": "node built/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
