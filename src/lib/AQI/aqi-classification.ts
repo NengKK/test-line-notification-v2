@@ -7,3 +7,8 @@ export function aqiClassification(aqi: number) : string {
   if (aqi > 200 && aqi <= 300) return 'มีผลกระทบต่อสุขภาพอย่างรุนแรง';
   return 'มีผลกระทบต่อสุขภาพอย่างรุนแรงอย่างที่สุด ควรหลีกเลี่ยงกิจกรรมกลางแจ้งอย่างเด็ดขาด';
 }
+
+export function isUnhealthy(aqi: number) {
+  if (!aqi) return false;
+  return aqi > 100;
+}
