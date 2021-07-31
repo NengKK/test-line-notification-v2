@@ -3,6 +3,8 @@ import axios, {AxiosRequestConfig} from 'axios';
 import {IAqiData} from './models/AQI/IAqiData';
 import { aqiClassification, isUnhealthy } from './lib/AQI/aqi-classification';
 import { Send } from './lib/LINE/notify';
+import { handleError } from './lib/Helper/error-handler';
+import { IWeatherWarningData } from './models/weather-warning/IWeatherWarningData';
 require('dotenv').config();
 
 const app = express();
@@ -137,6 +139,31 @@ app.get('/aqi/trigger', async (req, res) => {
     }
 
     res.status(500).send('เกิดข้อผิดพลาดในการเชื่อมต่อไปยัง AQICN');
+  }
+});
+
+app.get('/weather-warning', async (req, res) => {
+  const tmdUID = process.env.TMD_UID;
+  const tmdAPIKey = process.env.TMD_API_KEY;
+  const options: AxiosRequestConfig = {
+    method: 'GET',
+    url: `http://data.tmd.go.th/api/WeatherWarningNews/v1/?uid=${tmdUID}&ukey=${tmdAPIKey}&format=json`
+  };
+
+  try {
+    const { data } = await axios(options);
+    const weatherData = <IWeatherWarningData>data;
+
+    if (weatherData.header.status === '200 OK') {
+      await Send(weatherData.WarningNews.DescriptionThai);
+      res.send(weatherData.WarningNews);
+    } else {
+      console.error(weatherData.header.status);
+      res.sendStatus(500).send('TMD API error');
+    }
+  } catch (ex) {
+    handleError(ex);
+    res.sendStatus(500).send('Something went wrong!');
   }
 });
 
