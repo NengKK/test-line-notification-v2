@@ -3,9 +3,11 @@ import axios, {AxiosRequestConfig} from 'axios';
 import {IAqiData} from './models/AQI/IAqiData';
 import { aqiClassification, isUnhealthy } from './lib/AQI/aqi-classification';
 import { Send } from './lib/LINE/notify';
-import { handleError } from './lib/Helper/error-handler';
+import { handleError, stripHtmlText } from './lib/Helper/error-handler';
 import { IWeatherWarningData } from './models/weather-warning/IWeatherWarningData';
 require('dotenv').config();
+
+const Firestore = require('@google-cloud/firestore');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -145,6 +147,18 @@ app.get('/aqi/trigger', async (req, res) => {
 app.get('/weather-warning', async (req, res) => {
   const tmdUID = process.env.TMD_UID;
   const tmdAPIKey = process.env.TMD_API_KEY;
+
+  if (!tmdUID || ! tmdAPIKey || tmdUID === '' || tmdAPIKey === '') {
+    res.sendStatus(500).send('TMD API Key not found!!!');
+    return;
+  }
+
+  let isNotify: boolean = false;
+  if (req.query.notify && req.query.notify !== '') {
+    let notifyQueryString = req.query.notify?.toString();
+    isNotify = notifyQueryString.toLowerCase() === 'yes' || notifyQueryString === '1';
+  }
+
   const options: AxiosRequestConfig = {
     method: 'GET',
     url: `http://data.tmd.go.th/api/WeatherWarningNews/v1/?uid=${tmdUID}&ukey=${tmdAPIKey}&format=json`
@@ -155,7 +169,23 @@ app.get('/weather-warning', async (req, res) => {
     const weatherData = <IWeatherWarningData>data;
 
     if (weatherData.header.status === '200 OK') {
-      await Send(weatherData.WarningNews.DescriptionThai);
+      console.info(`Notify flag: ${isNotify}`);
+      if (isNotify) {
+        const db = new Firestore({
+          projectId: 'line-notification-321208',
+          keyFilename: './gcloud-credential/line-notification-321208-8897be33d0f3.json',
+        });
+  
+        const docRef = db.collection('tmd-weather-warning-tracking').doc(weatherData.WarningNews.AnnounceDateTime);
+        const doc = await docRef.get();
+  
+        if (!doc.exists) {
+          await docRef.set(weatherData.WarningNews);
+          await Send(stripHtmlText(weatherData.WarningNews.DescriptionThai));
+          await Send(`เอกสาร: ${weatherData.WarningNews.DocumentFile}`);
+        }
+      }
+      
       res.send(weatherData.WarningNews);
     } else {
       console.error(weatherData.header.status);
