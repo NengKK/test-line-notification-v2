@@ -149,51 +149,53 @@ app.get('/weather-warning', async (req, res) => {
   const tmdAPIKey = process.env.TMD_API_KEY;
 
   if (!tmdUID || ! tmdAPIKey || tmdUID === '' || tmdAPIKey === '') {
-    res.sendStatus(500).send('TMD API Key not found!!!');
-    return;
-  }
-
-  let isNotify: boolean = false;
-  if (req.query.notify && req.query.notify !== '') {
-    let notifyQueryString = req.query.notify?.toString();
-    isNotify = notifyQueryString.toLowerCase() === 'yes' || notifyQueryString === '1';
-  }
-
-  const options: AxiosRequestConfig = {
-    method: 'GET',
-    url: `http://data.tmd.go.th/api/WeatherWarningNews/v1/?uid=${tmdUID}&ukey=${tmdAPIKey}&format=json`
-  };
-
-  try {
-    const { data } = await axios(options);
-    const weatherData = <IWeatherWarningData>data;
-
-    if (weatherData.header.status === '200 OK') {
-      console.info(`Notify flag: ${isNotify}`);
-      if (isNotify) {
-        const db = new Firestore({
-          projectId: 'line-notification-321208',
-          keyFilename: './gcloud-credential/line-notification-321208-8897be33d0f3.json',
-        });
-  
-        const docRef = db.collection('tmd-weather-warning-tracking').doc(weatherData.WarningNews.AnnounceDateTime);
-        const doc = await docRef.get();
-  
-        if (!doc.exists) {
-          await docRef.set(weatherData.WarningNews);
-          await Send(stripHtmlText(weatherData.WarningNews.DescriptionThai));
-          await Send(`เอกสาร: ${weatherData.WarningNews.DocumentFile}`);
-        }
-      }
-      
-      res.send(weatherData.WarningNews);
-    } else {
-      console.error(weatherData.header.status);
-      res.sendStatus(500).send('TMD API error');
+    res.status(500).send('TMD API Key not found!!!');
+  } else {
+    let isNotify: boolean = false;
+    if (req.query.notify && req.query.notify !== '') {
+      let notifyQueryString = req.query.notify?.toString();
+      isNotify = notifyQueryString.toLowerCase() === 'yes' || notifyQueryString === '1';
     }
-  } catch (ex) {
-    handleError(ex);
-    res.sendStatus(500).send('Something went wrong!');
+  
+    const options: AxiosRequestConfig = {
+      method: 'GET',
+      url: `http://data.tmd.go.th/api/WeatherWarningNews/v1/?uid=${tmdUID}&ukey=${tmdAPIKey}&format=json`
+    };
+  
+    try {
+      const { data } = await axios(options);
+      const weatherData = <IWeatherWarningData>data;
+  
+      if (weatherData.header.status === '200 OK') {
+        console.info(`Get weather warning data: Issue = ${weatherData.WarningNews.IssueNo}, Announce date = ${weatherData.WarningNews.AnnounceDateTime}`);
+        console.info(`Notify flag: ${isNotify}`);
+        if (isNotify) {
+          const db = new Firestore({
+            projectId: 'line-notification-321208',
+            keyFilename: './gcloud-credential/line-notification-321208-8897be33d0f3.json',
+          });
+    
+          const docRef = db.collection('tmd-weather-warning-tracking').doc(weatherData.WarningNews.AnnounceDateTime);
+          const doc = await docRef.get();
+    
+          if (!doc.exists) {
+            await docRef.set(weatherData.WarningNews);
+            console.info('Wrote weather warning data to database successfully');
+            await Send(stripHtmlText(weatherData.WarningNews.DescriptionThai));
+            await Send(`เอกสาร: ${weatherData.WarningNews.DocumentFile}`);
+            console.info('Sent notify successfully');
+          }
+        }
+        
+        res.send(weatherData.WarningNews);
+      } else {
+        console.error(weatherData.header.status);
+        res.sendStatus(500).send('TMD API error');
+      }
+    } catch (ex) {
+      handleError(ex);
+      res.sendStatus(500).send('Something went wrong!');
+    }
   }
 });
 
