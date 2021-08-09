@@ -171,8 +171,7 @@ app.get('/weather-warning', async (req, res) => {
         console.info(`Notify flag: ${isNotify}`);
         if (isNotify) {
           const db = new Firestore({
-            projectId: 'line-notification-321208',
-            keyFilename: './gcloud-credential/line-notification-321208-8897be33d0f3.json',
+            projectId: process.env.GCLOUD_PROJECT_ID
           });
     
           const docRef = db.collection('tmd-weather-warning-tracking').doc(weatherData.WarningNews.AnnounceDateTime);

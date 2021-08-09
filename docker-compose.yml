@@ -1,6 +1,7 @@
 version: '3'
 services:
   web:
+    image: gcr.io/${GCLOUD_PROJECT_ID}/${GCLOUD_APP_NAME}:latest
     build: .
     ports:
       - "80:${PORT}"
@@ -13,4 +14,5 @@ services:
       - NOTIFY_ONLY_UNHEALTHY=${NOTIFY_ONLY_UNHEALTHY}
       - TMD_UID=${TMD_UID}
       - TMD_API_KEY=${TMD_API_KEY}
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
       - PORT=${PORT}
