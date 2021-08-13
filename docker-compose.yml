@@ -4,7 +4,7 @@ services:
     image: gcr.io/${GCLOUD_PROJECT_ID}/${GCLOUD_APP_NAME}:latest
     build: .
     ports:
-      - "80:${PORT}"
+      - '80:${PORT}'
     environment:
       - AQI_CN_URL=${AQI_CN_URL}
       - AQI_CN_TOKEN=${AQI_CN_TOKEN}
