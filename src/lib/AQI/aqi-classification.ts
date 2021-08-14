@@ -1,4 +1,4 @@
-export function aqiClassification(aqi: number) : string {
+export function aqiClassification(aqi: number): string {
   if (!aqi || aqi <= 0) return 'ไม่สามารถแปลผลได้';
   if (aqi > 0 && aqi <= 50) return 'ดี';
   if (aqi > 50 && aqi <= 100) return 'ปานกลาง';

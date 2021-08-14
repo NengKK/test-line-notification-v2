@@ -4,7 +4,7 @@ services:
     image: gcr.io/${GCLOUD_PROJECT_ID}/${GCLOUD_APP_NAME}:latest
     build: .
     ports:
-      - "80:${PORT}"
+      - '80:${PORT}'
     environment:
       - AQI_CN_URL=${AQI_CN_URL}
       - AQI_CN_TOKEN=${AQI_CN_TOKEN}
@@ -14,5 +14,6 @@ services:
       - NOTIFY_ONLY_UNHEALTHY=${NOTIFY_ONLY_UNHEALTHY}
       - TMD_UID=${TMD_UID}
       - TMD_API_KEY=${TMD_API_KEY}
+      - API_KEY=${API_KEY}
       - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
       - PORT=${PORT}
