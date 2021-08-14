@@ -2,6 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { IAqiData } from '../../models/AQI/IAqiData';
 import { aqiClassification, isUnhealthy } from './aqi-classification';
 import { Send } from '../LINE/notify';
+import { handleError } from '../Helper/error-handler';
 require('dotenv').config();
 
 const NOTIFY_ONLY_UNHEALTHY =
@@ -57,7 +58,7 @@ var get = async (req: any, res: any, next: any) => {
   res.send(message);
 };
 
-var trigger = async (req: any, res: any, next: any) => {
+var notify = async (req: any, res: any, next: any) => {
   let location: string;
   if (req.query.location && req.query.location !== '') {
     location = req.query.location?.toString();
@@ -116,18 +117,13 @@ var trigger = async (req: any, res: any, next: any) => {
       message = 'ไม่สามารถเรียกดูข้อมูล AQI จาก AQICN ได้';
       res.status(500).send();
     }
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error(`Axios error: ${error}`);
-    } else {
-      console.error(`Unexpected error: ${error}`);
-    }
-
+  } catch (ex) {
+    handleError(ex);
     res.status(500).send('เกิดข้อผิดพลาดในการเชื่อมต่อไปยัง AQICN');
   }
 };
 
 module.exports = {
   get,
-  trigger,
+  notify,
 };
