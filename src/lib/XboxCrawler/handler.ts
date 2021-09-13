@@ -40,10 +40,8 @@ var notify = async (req: any, res: any, next: any) => {
       },
     });
 
-    console.info(`SERIES S: ${process.env.XBOX_SERIES_S_URL}`);
-    console.info(`SERIES X: ${process.env.XBOX_SERIES_X_URL}`);
     await c.queue([
-      process.env.XBOX_SERIES_S_URL,
+      // process.env.XBOX_SERIES_S_URL,
       process.env.XBOX_SERIES_X_URL,
     ]);
 
