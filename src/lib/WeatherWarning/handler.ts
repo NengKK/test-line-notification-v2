@@ -15,7 +15,7 @@ var get = async (req: any, res: any, next: any) => {
   } else {
     const options: AxiosRequestConfig = {
       method: 'GET',
-      url: `http://data.tmd.go.th/api/WeatherWarningNews/v1/?uid=${tmdUID}&ukey=${tmdAPIKey}&format=json`,
+      url: `http://data.tmd.go.th/api/WeatherWarningNews/v2/?uid=${tmdUID}&ukey=${tmdAPIKey}&format=json`,
     };
 
     try {
@@ -23,10 +23,15 @@ var get = async (req: any, res: any, next: any) => {
       const weatherData = <IWeatherWarningData>data;
 
       if (weatherData.header.status === '200 OK') {
-        console.info(
-          `Get weather warning data: Issue = ${weatherData.WarningNews.IssueNo}, Announce date = ${weatherData.WarningNews.AnnounceDateTime}`
-        );
-        res.send(weatherData.WarningNews);
+        if (weatherData.WarningNews) {
+          console.info(
+            `Get weather warning data: Issue = ${weatherData.WarningNews.IssueNo}, Announce date = ${weatherData.WarningNews.AnnounceDateTime}`
+          );
+          res.send(weatherData.WarningNews);
+        } else {
+          console.info(`There is no warning news from TMD.`);
+          res.send('There is no warning news from TMD.');
+        }
       } else {
         console.error(weatherData.header.status);
         res.sendStatus(500).send('TMD API error');
@@ -47,7 +52,7 @@ var notify = async (req: any, res: any, next: any) => {
   } else {
     const options: AxiosRequestConfig = {
       method: 'GET',
-      url: `http://data.tmd.go.th/api/WeatherWarningNews/v1/?uid=${tmdUID}&ukey=${tmdAPIKey}&format=json`,
+      url: `http://data.tmd.go.th/api/WeatherWarningNews/v2/?uid=${tmdUID}&ukey=${tmdAPIKey}&format=json`,
     };
 
     try {
@@ -55,28 +60,33 @@ var notify = async (req: any, res: any, next: any) => {
       const weatherData = <IWeatherWarningData>data;
 
       if (weatherData.header.status === '200 OK') {
-        console.info(
-          `Get weather warning data: Issue = ${weatherData.WarningNews.IssueNo}, Announce date = ${weatherData.WarningNews.AnnounceDateTime}`
-        );
+        if (weatherData.WarningNews) {
+          console.info(
+            `Get weather warning data: Issue = ${weatherData.WarningNews.IssueNo}, Announce date = ${weatherData.WarningNews.AnnounceDateTime}`
+          );
 
-        const db = new Firestore({
-          projectId: process.env.GCLOUD_PROJECT_ID,
-        });
+          const db = new Firestore({
+            projectId: process.env.GCLOUD_PROJECT_ID,
+          });
 
-        const docRef = db
-          .collection('tmd-weather-warning-tracking')
-          .doc(weatherData.WarningNews.AnnounceDateTime);
-        const doc = await docRef.get();
+          const docRef = db
+            .collection('tmd-weather-warning-tracking')
+            .doc(weatherData.WarningNews.AnnounceDateTime);
+          const doc = await docRef.get();
 
-        if (!doc.exists) {
-          await docRef.set(weatherData.WarningNews);
-          console.info('Wrote weather warning data to database successfully');
-          await Send(stripHtmlText(weatherData.WarningNews.DescriptionThai));
-          await Send(`เอกสาร: ${weatherData.WarningNews.DocumentFile}`);
-          console.info('Sent notify successfully');
-          res.send('Sent notify successfully');
+          if (!doc.exists) {
+            await docRef.set(weatherData.WarningNews);
+            console.info('Wrote weather warning data to database successfully');
+            await Send(stripHtmlText(weatherData.WarningNews.DescriptionThai));
+            await Send(`เอกสาร: ${weatherData.WarningNews.DocumentFile}`);
+            console.info('Sent notify successfully');
+            res.send('Sent notify successfully');
+          } else {
+            res.send('The latest warning news has already been sent!');
+          }
         } else {
-          res.send('The latest warning news has already been sent!');
+          console.info('There is no warning news from TMD.');
+          res.send('There is no warning news from TMD.');
         }
       } else {
         console.error(weatherData.header.status);
