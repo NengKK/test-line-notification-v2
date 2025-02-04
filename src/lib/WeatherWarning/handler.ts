@@ -37,7 +37,8 @@ var get = async (req: any, res: any, next: any) => {
         res.sendStatus(500).send('TMD API error');
       }
     } catch (ex) {
-      handleError(ex);
+      if (ex instanceof Error) handleError(ex);
+      else console.error('UNHANDLED ERROR: Something went wrong!');
       res.sendStatus(500).send('Something went wrong!');
     }
   }
