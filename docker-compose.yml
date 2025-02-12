@@ -1,19 +1,22 @@
 version: '3'
 services:
-  web:
-    image: gcr.io/${GCLOUD_PROJECT_ID}/${GCLOUD_APP_NAME}:latest
-    build: .
-    ports:
-      - '80:${PORT}'
-    environment:
-      - AQI_CN_URL=${AQI_CN_URL}
-      - AQI_CN_TOKEN=${AQI_CN_TOKEN}
-      - DEFAULT_LOCATION_NAME=${DEFAULT_LOCATION_NAME}
-      - LINE_NOTIFY_ACCESS_TOKEN=${LINE_NOTIFY_ACCESS_TOKEN}
-      - LINE_NOTIFY_BASE_URL=${LINE_NOTIFY_BASE_URL}
-      - NOTIFY_ONLY_UNHEALTHY=${NOTIFY_ONLY_UNHEALTHY}
-      - TMD_UID=${TMD_UID}
-      - TMD_API_KEY=${TMD_API_KEY}
-      - API_KEY=${API_KEY}
-      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
-      - PORT=${PORT}
+    web:
+        image: gcr.io/${GCLOUD_PROJECT_ID}/${GCLOUD_APP_NAME}:latest
+        build: .
+        ports:
+            - '80:${PORT}'
+        environment:
+            - AQI_CN_URL=${AQI_CN_URL}
+            - AQI_CN_TOKEN=${AQI_CN_TOKEN}
+            - DEFAULT_LOCATION_NAME=${DEFAULT_LOCATION_NAME}
+            - LINE_NOTIFY_ACCESS_TOKEN=${LINE_NOTIFY_ACCESS_TOKEN}
+            - LINE_NOTIFY_BASE_URL=${LINE_NOTIFY_BASE_URL}
+            - NOTIFY_ONLY_UNHEALTHY=${NOTIFY_ONLY_UNHEALTHY}
+            - TMD_UID=${TMD_UID}
+            - TMD_API_KEY=${TMD_API_KEY}
+            - API_KEY=${API_KEY}
+            - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+            - PORT=${PORT}
+            - PRIVATE_KEY=${PRIVATE_KEY}
+            - LINE_CHANNEL_ID=${LINE_CHANNEL_ID}
+            - LINE_KID=${LINE_KID}
