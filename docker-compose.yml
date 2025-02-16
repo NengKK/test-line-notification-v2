@@ -19,4 +19,5 @@ services:
             - PORT=${PORT}
             - PRIVATE_KEY=${PRIVATE_KEY}
             - LINE_CHANNEL_ID=${LINE_CHANNEL_ID}
+            - LINE_CHANNEL_SECRET=${LINE_CHANNEL_SECRET}
             - LINE_KID=${LINE_KID}

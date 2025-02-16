@@ -2,9 +2,13 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { IAqiData } from '../../models/AQI/IAqiData';
 import { aqiClassification, isUnhealthy } from './aqi-classification';
 import { handleError } from '../Helper/error-handler';
-import { IssueAccessToken, SendBroadcastMessage } from '../LINE/messaging-api';
+import {
+    IssueStatelessAccessTokenWithJwt,
+    SendBroadcastMessage,
+} from '../LINE/messaging-api';
 import { GetJwtToken } from '../Utilities/jwt';
 import { IAccessTokenData } from '../../models/LINE/IAccessTokenData';
+import { IStatelessAccessTokenData } from '../../models/LINE/IStatelessAccessTokenData';
 require('dotenv').config();
 
 const NOTIFY_ONLY_UNHEALTHY =
@@ -104,6 +108,27 @@ var notify = async (req: any, res: any, next: any) => {
                     )})`;
                     try {
                         let jwtToken = await GetJwtToken();
+                        let accessToken: IStatelessAccessTokenData | null =
+                            null;
+                        const { data: accessTokenResponse } =
+                            await IssueStatelessAccessTokenWithJwt(jwtToken);
+                        accessToken = <IStatelessAccessTokenData>(
+                            accessTokenResponse
+                        );
+
+                        if (
+                            typeof accessToken !== undefined &&
+                            accessToken !== null
+                        ) {
+                            const { data: broadcastResult } =
+                                await SendBroadcastMessage(
+                                    message,
+                                    accessToken.access_token
+                                );
+                        }
+
+                        /*
+                        let jwtToken = await GetJwtToken();
                         let accessToken: IAccessTokenData | null = null;
                         const { data: accessTokenResponse } =
                             await IssueAccessToken(jwtToken);
@@ -119,6 +144,7 @@ var notify = async (req: any, res: any, next: any) => {
                                     accessToken.access_token
                                 );
                         }
+                        */
 
                         res.send('Broadcast message success');
                     } catch (error) {

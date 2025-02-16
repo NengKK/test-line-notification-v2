@@ -21,6 +21,50 @@ export async function IssueAccessToken(jwtToken: JWS.CreateSignResult) {
     return axios(options);
 }
 
+export async function IssueStatelessAccessTokenWithJwt(
+    jwtToken: JWS.CreateSignResult
+) {
+    const data = {
+        grant_type: 'client_credentials',
+        client_assertion_type:
+            'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+        client_assertion: `${jwtToken}`,
+    };
+
+    const options: AxiosRequestConfig = {
+        method: 'POST',
+        url: 'https://api.line.me/oauth2/v3/token',
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+        },
+        data: qs.stringify(data),
+    };
+
+    return axios(options);
+}
+
+export async function IssueStatelessAccessToken(
+    channelId: string,
+    channelSecret: string
+) {
+    const data = {
+        grant_type: 'client_credentials',
+        client_id: channelId,
+        client_secret: channelSecret,
+    };
+
+    const options: AxiosRequestConfig = {
+        method: 'POST',
+        url: 'https://api.line.me/oauth2/v3/token',
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+        },
+        data: qs.stringify(data),
+    };
+
+    return axios(options);
+}
+
 export async function SendBroadcastMessage(
     message: string,
     accessToken: string
