@@ -9,12 +9,12 @@ var weatherHandler = require('./routes/weather');
 var middleware = require('./routes/middleware');
 
 app.get('/', (req, res) => {
-  res.send('Alive!');
+    res.send('Alive!');
 });
 app.post('*', middleware.auth);
 app.use('/aqi', aqiHandler);
 app.use('/weather', weatherHandler);
 
 app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}!`);
+    console.log(`Listening on port ${PORT}!`);
 });
