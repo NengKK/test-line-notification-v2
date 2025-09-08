@@ -8,14 +8,23 @@ import {
     SendBroadcastMessage,
 } from '../LINE/messaging-api';
 import { GetTmdConfig } from '../Utilities/env';
+import { ITmdConfig } from '../../models/weather-warning/ITmdConfig';
 require('dotenv').config();
 
 const Firestore = require('@google-cloud/firestore');
 
 var get = async (req: any, res: any, next: any) => {
-    const tmdConfig = GetTmdConfig();
-    const tmdUID = tmdConfig.uid;
-    const tmdAPIKey = tmdConfig.apiKey;
+    let tmdConfig: ITmdConfig;
+    let tmdUID: string = '';
+    let tmdAPIKey: string = '';
+
+    try {
+        tmdConfig = await GetTmdConfig();
+        tmdUID = tmdConfig.uid;
+        tmdAPIKey = tmdConfig.apiKey;
+    } catch (ex: any) {
+        res.status(500).send('Config not found!!!');
+    }
 
     if (!tmdUID || !tmdAPIKey || tmdUID === '' || tmdAPIKey === '') {
         res.status(500).send('TMD API Key not found!!!');
@@ -52,9 +61,17 @@ var get = async (req: any, res: any, next: any) => {
 };
 
 var notify = async (req: any, res: any, next: any) => {
-    const tmdConfig = GetTmdConfig();
-    const tmdUID = tmdConfig.uid;
-    const tmdAPIKey = tmdConfig.apiKey;
+    let tmdConfig: ITmdConfig;
+    let tmdUID: string = '';
+    let tmdAPIKey: string = '';
+
+    try {
+        tmdConfig = await GetTmdConfig();
+        tmdUID = tmdConfig.uid;
+        tmdAPIKey = tmdConfig.apiKey;
+    } catch (ex: any) {
+        res.status(500).send('Config not found!!!');
+    }
 
     if (!tmdUID || !tmdAPIKey || tmdUID === '' || tmdAPIKey === '') {
         res.status(500).send('TMD API Key not found!!!');

@@ -1,8 +1,17 @@
 import { ILineConfig } from '../../models/LINE/ILineConfig';
 import { ITmdConfig } from '../../models/weather-warning/ITmdConfig';
+import { GetSecretValue } from './gcloud-secret-manager';
 
-export function GetLineConfig(): ILineConfig {
-    let lineConfig: string = process.env.LINE_CONFIG?.toString() ?? '';
+export async function GetLineConfig(): Promise<ILineConfig> {
+    let lineConfig: string = '';
+    try {
+        lineConfig = (await GetSecretValue('LINE_CONFIG')) || '';
+    } catch (error: any) {
+        throw new Error(
+            'Failed to get LINE_CONFIG from Secret Manager: ' + error.message
+        );
+    }
+
     if (lineConfig === '')
         throw new Error('LINE_CONFIG environment variable is not defined');
 
@@ -16,8 +25,11 @@ export function GetLineConfig(): ILineConfig {
     }
 }
 
-export function GetTmdConfig() {
-    let tmdConfig: string = process.env.TMD_CONFIG?.toString() ?? '';
+export async function GetTmdConfig() {
+    const tmdConfig = await GetSecretValue('TMD_CONFIG');
+    if (!tmdConfig) throw new Error('TMD_CONFIG secret is not defined');
+
+    // let tmdConfig: string = process.env.TMD_CONFIG?.toString() ?? '';
     if (tmdConfig === '')
         throw new Error('TMD_CONFIG environment variable is not defined');
 

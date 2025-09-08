@@ -6,7 +6,7 @@ require('dotenv').config();
 const PRIVATE_KEY = process.env.PRIVATE_KEY || '';
 
 export async function GetJwtToken() {
-    let lineConfig: ILineConfig = GetLineConfig();
+    let lineConfig: ILineConfig = await GetLineConfig();
 
     let privateKey = PRIVATE_KEY;
 
