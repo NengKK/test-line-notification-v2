@@ -127,25 +127,6 @@ var notify = async (req: any, res: any, next: any) => {
                                 );
                         }
 
-                        /*
-                        let jwtToken = await GetJwtToken();
-                        let accessToken: IAccessTokenData | null = null;
-                        const { data: accessTokenResponse } =
-                            await IssueAccessToken(jwtToken);
-                        accessToken = <IAccessTokenData>accessTokenResponse;
-
-                        if (
-                            typeof accessToken !== undefined &&
-                            accessToken !== null
-                        ) {
-                            const { data: broadcastResult } =
-                                await SendBroadcastMessage(
-                                    message,
-                                    accessToken.access_token
-                                );
-                        }
-                        */
-
                         res.send('Broadcast message success');
                     } catch (error) {
                         res.send(error);
@@ -163,7 +144,7 @@ var notify = async (req: any, res: any, next: any) => {
             message = 'ไม่สามารถเรียกดูข้อมูล AQI จาก AQICN ได้';
             res.status(500).send();
         }
-    } catch (ex) {
+    } catch (ex: any) {
         handleError(ex);
         res.status(500).send('เกิดข้อผิดพลาดในการเชื่อมต่อไปยัง AQICN');
     }

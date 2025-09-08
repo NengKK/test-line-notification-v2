@@ -1,20 +1,21 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { IWeatherWarningData } from '../../models/weather-warning/IWeatherWarningData';
 import { handleError, stripHtmlText } from '../Helper/error-handler';
-import { Send } from '../LINE/notify';
 import { GetJwtToken } from '../Utilities/jwt';
 import { IStatelessAccessTokenData } from '../../models/LINE/IStatelessAccessTokenData';
 import {
     IssueStatelessAccessTokenWithJwt,
     SendBroadcastMessage,
 } from '../LINE/messaging-api';
+import { GetTmdConfig } from '../Utilities/env';
 require('dotenv').config();
 
 const Firestore = require('@google-cloud/firestore');
 
 var get = async (req: any, res: any, next: any) => {
-    const tmdUID = process.env.TMD_UID;
-    const tmdAPIKey = process.env.TMD_API_KEY;
+    const tmdConfig = GetTmdConfig();
+    const tmdUID = tmdConfig.uid;
+    const tmdAPIKey = tmdConfig.apiKey;
 
     if (!tmdUID || !tmdAPIKey || tmdUID === '' || tmdAPIKey === '') {
         res.status(500).send('TMD API Key not found!!!');
@@ -51,8 +52,9 @@ var get = async (req: any, res: any, next: any) => {
 };
 
 var notify = async (req: any, res: any, next: any) => {
-    const tmdUID = process.env.TMD_UID;
-    const tmdAPIKey = process.env.TMD_API_KEY;
+    const tmdConfig = GetTmdConfig();
+    const tmdUID = tmdConfig.uid;
+    const tmdAPIKey = tmdConfig.apiKey;
 
     if (!tmdUID || !tmdAPIKey || tmdUID === '' || tmdAPIKey === '') {
         res.status(500).send('TMD API Key not found!!!');
@@ -127,7 +129,7 @@ var notify = async (req: any, res: any, next: any) => {
                 console.error(weatherData.header.status);
                 res.sendStatus(500).send('TMD API error');
             }
-        } catch (ex) {
+        } catch (ex: any) {
             handleError(ex);
             res.sendStatus(500).send('Something went wrong!');
         }
