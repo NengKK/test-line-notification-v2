@@ -29,7 +29,6 @@ export async function GetTmdConfig() {
     const tmdConfig = await GetSecretValue('TMD_CONFIG');
     if (!tmdConfig) throw new Error('TMD_CONFIG secret is not defined');
 
-    // let tmdConfig: string = process.env.TMD_CONFIG?.toString() ?? '';
     if (tmdConfig === '')
         throw new Error('TMD_CONFIG environment variable is not defined');
 

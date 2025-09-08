@@ -1,6 +1,10 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import qs from 'qs';
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+
+if (process.env.NODE_ENV !== 'production') {
+    dotenv.config();
+}
 
 // Obsolete, use SendBroadcastMessage instead
 export async function Send(message: string) {

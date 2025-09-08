@@ -1,19 +1,41 @@
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import * as dotenv from 'dotenv';
 
-dotenv.config();
+console.log('Environment:', process.env.NODE_ENV);
+if (process.env.NODE_ENV !== 'production') {
+    dotenv.config();
+}
 
+const axios = require('axios');
 const client = new SecretManagerServiceClient();
+
+export async function GetProjectIdFromMetadata() {
+    console.log('Environment inside:', process.env.NODE_ENV);
+    if (process.env.NODE_ENV !== 'production') {
+        return process.env.GCLOUD_PROJECT_ID || 'local-development';
+    } else {
+        try {
+            const response = await axios.get(
+                'http://metadata.google.internal/computeMetadata/v1/project/project-id',
+                {
+                    headers: { 'Metadata-Flavor': 'Google' },
+                }
+            );
+            return response.data;
+        } catch (error) {
+            console.error(
+                'Error fetching Project ID from metadata server:',
+                error
+            );
+            return null;
+        }
+    }
+}
 
 export async function GetSecretValue(
     secretName: string
 ): Promise<string | undefined> {
-    const projectId = process.env.GCP_PROJECT_ID;
-    if (!projectId) {
-        console.error('GCP_PROJECT_ID environment variable is not set.');
-        return;
-    }
-
+    const projectId = await GetProjectIdFromMetadata();
     const name = `projects/${projectId}/secrets/${secretName}/versions/latest`;
 
     try {

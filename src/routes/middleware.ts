@@ -1,5 +1,9 @@
 import { handleError } from '../lib/Helper/error-handler';
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+
+if (process.env.NODE_ENV !== 'production') {
+    dotenv.config();
+}
 
 var auth = (req: any, res: any, next: any) => {
     try {

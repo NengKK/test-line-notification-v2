@@ -1,7 +1,11 @@
 import * as jose from 'node-jose';
 import { ILineConfig } from '../../models/LINE/ILineConfig';
 import { GetLineConfig } from './env';
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+
+if (process.env.NODE_ENV !== 'production') {
+    dotenv.config();
+}
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY || '';
 

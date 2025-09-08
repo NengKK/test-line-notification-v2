@@ -7,9 +7,12 @@ import {
     SendBroadcastMessage,
 } from '../LINE/messaging-api';
 import { GetJwtToken } from '../Utilities/jwt';
-import { IAccessTokenData } from '../../models/LINE/IAccessTokenData';
 import { IStatelessAccessTokenData } from '../../models/LINE/IStatelessAccessTokenData';
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+
+if (process.env.NODE_ENV !== 'production') {
+    dotenv.config();
+}
 
 const NOTIFY_ONLY_UNHEALTHY =
     (process.env.NOTIFY_ONLY_UNHEALTHY || '1') !== '0';
@@ -34,7 +37,7 @@ var get = async (req: any, res: any, next: any) => {
     try {
         const { data } = await axios(options);
 
-        if (data.status === 'ok') {
+        if (data !== undefined && data.status === 'ok') {
             if (data.data.length > 0) {
                 let aqiJSONData = data.data[0];
                 console.log(`result: ${JSON.stringify(aqiJSONData)}`);
